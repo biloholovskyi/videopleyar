@@ -1,16 +1,31 @@
 let interval;
 let timeData = [];
 
+const thumbnail = $('.video-thumbnail');
+const progressBar = $('.video-progress-bar');
+const videoWrapper = $('.body-player__video-wrapper');
+
 $(document).ready(function (e) {
   setXmlData();
 
   const video = $('.body-player__video-wrapper video');
 
-  $('.body-player__slide-list').on('click', ".slide", switchOnClickSlide)
+  // $('.body-player__slide-list').on('click', ".slide", switchOnClickSlide)
 
   video.on('play', () => switchSlideOnPlaying());
-  video.on('pause', () => clearInterval(interval));
+  video.on('pause', () => {
+    clearInterval(interval);
+    videoWrapper.attr('data-status', 'stop');
+  });
+  video.on('timeupdate', () => {
+    if(videoWrapper.attr('data-status') === 'stop') {
+      video[0].play()
+    }
+  })
   $('.slide-buttons').on('click', '.slide-button', switchOnButton)
+  progressBar.on('mousemove', (e) => showThumbnail(e))
+  progressBar.on('mouseleave', () => hiddenThumbnail())
+
 });
 
 // get data from xml
@@ -40,7 +55,7 @@ const setXmlData = () => {
         timeData.push(timeSeconds);
 
         // render slides
-        $('.body-player__slide-list').append('<img src="' + file + '" alt="slide" class="slide" data-time="' + time + '" data-second="' + timeSeconds + '">')
+        $('.body-player__slide-list').append(`<img src="${file}" alt="slide" class="slide ${count === 1 && "active-slide"}" data-time="${time}" data-second="${timeSeconds}">`)
 
         // render buttons
         $('.slide-buttons').append(`<div class="slide-button ${count === 1 && "slide-button--active"}" data-time="${time}" data-second="${timeSeconds}">${count}</div>`)
@@ -82,6 +97,8 @@ function switchSlideOnPlaying (e) {
   const slides = $('.body-player__slide-list .slide');
   const buttons = $('.slide-buttons .slide-button');
 
+  $('.body-player__video-wrapper').attr('data-status', 'play');
+
   interval = setInterval(() => {
     let needIndex = 0;
     let index = 0;
@@ -96,10 +113,6 @@ function switchSlideOnPlaying (e) {
     if(!slides[needIndex].classList.contains('active-slide')) {
       slides.removeClass('active-slide');
       slides[needIndex].classList.add('active-slide')
-
-      $('html, body').animate({
-        scrollTop: $(".active-slide").offset().top - 360
-      }, 1000);
     }
 
     if(!buttons[needIndex].classList.contains('slide-button--active')) {
@@ -127,4 +140,18 @@ function switchOnButton (e) {
 
   $('.slide-buttons .slide-button').removeClass('slide-button--active');
   $(this).addClass('slide-button--active');
+}
+
+// show thumbnail on progress bar hover
+function showThumbnail (e) {
+  thumbnail.fadeIn('fast');
+
+  thumbnail.css({
+    left: `${e.pageX}px`,
+  })
+}
+
+// hidden thumbnail
+function hiddenThumbnail () {
+  thumbnail.fadeOut('fast');
 }
