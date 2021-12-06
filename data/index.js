@@ -4,25 +4,32 @@ let timeData = [];
 $(document).ready(function (e) {
   setXmlData();
 
+  const video = $('.body-player__video-wrapper video');
+
   $('.body-player__slide-list').on('click', ".slide", switchOnClickSlide)
 
-  $('.body-player__video-wrapper video').on('play', switchSlideOnPlaying);
-  $('.body-player__video-wrapper video').on('pause', () => clearInterval(interval));
+  video.on('play', () => switchSlideOnPlaying());
+  video.on('pause', () => clearInterval(interval));
+  $('.slide-buttons').on('click', '.slide-button', switchOnButton)
 });
 
+// get data from xml
 const setXmlData = () => {
   $.ajax({
     url: "./index.xml",
-    success: function(xml){
+    success: function (xml) {
       let video = '';
       $(xml).find('video').each(function () {
         video = $(this).attr('label');
       })
 
+      // set video from xml
       $('.body-player__video-wrapper video').attr('src', video);
 
 
-      $(xml).find('slide').each(function(){
+      // render all slides and buttons
+      let count = 1;
+      $(xml).find('slide').each(function () {
         const time = $(this).attr('time');
         const file = $(this).attr('file');
 
@@ -32,13 +39,19 @@ const setXmlData = () => {
         const timeSeconds = minute * 60 + second;
         timeData.push(timeSeconds);
 
+        // render slides
         $('.body-player__slide-list').append('<img src="' + file + '" alt="slide" class="slide" data-time="' + time + '" data-second="' + timeSeconds + '">')
+
+        // render buttons
+        $('.slide-buttons').append(`<div class="slide-button ${count === 1 && "slide-button--active"}" data-time="${time}" data-second="${timeSeconds}">${count}</div>`)
+        count++;
       });
     }
-
-  });
+  })
+    .catch(e => console.error(e));
 }
 
+// switch video on slide click
 function switchOnClickSlide (e) {
   let current = '';
 
@@ -59,12 +72,15 @@ function switchOnClickSlide (e) {
   $(this).addClass('active-slide');
 
   $('html, body').animate({
-    scrollTop: $(".active-slide").offset().top - 300
+    scrollTop: $(".active-slide").offset().top - 360
   }, 1000);
 }
 
+// switch slide on video playing
 function switchSlideOnPlaying (e) {
   const video = $('.body-player__video-wrapper video')[0];
+  const slides = $('.body-player__slide-list .slide');
+  const buttons = $('.slide-buttons .slide-button');
 
   interval = setInterval(() => {
     let needIndex = 0;
@@ -77,13 +93,38 @@ function switchSlideOnPlaying (e) {
     })
 
 
-    if(!$('.body-player__slide-list .slide')[needIndex].classList.contains('active-slide')) {
-      $('.body-player__slide-list .slide').removeClass('active-slide');
-      $('.body-player__slide-list .slide')[needIndex].classList.add('active-slide')
+    if(!slides[needIndex].classList.contains('active-slide')) {
+      slides.removeClass('active-slide');
+      slides[needIndex].classList.add('active-slide')
 
       $('html, body').animate({
-        scrollTop: $(".active-slide").offset().top - 300
+        scrollTop: $(".active-slide").offset().top - 360
       }, 1000);
     }
+
+    if(!buttons[needIndex].classList.contains('slide-button--active')) {
+      buttons.removeClass('slide-button--active');
+      buttons[needIndex].classList.add('slide-button--active')
+    }
   }, 1000)
+}
+
+// switch video on button click
+function switchOnButton (e) {
+  let current = '';
+  console.log($(this));
+
+  $(this).each(function () {
+    current = $(this).attr('data-second');
+  })
+
+  const video = $('.body-player__video-wrapper video')[0];
+
+  video.currentTime = current;
+  video.play();
+
+  $('.body-player__slide-list .slide').removeClass('active-slide');
+
+  $('.slide-buttons .slide-button').removeClass('slide-button--active');
+  $(this).addClass('slide-button--active');
 }
