@@ -59,6 +59,8 @@ body {
 
 .body-player__slide-list {
   padding-top: 345px;
+  height: 100vh;
+  overflow: auto;
 }
 
 .body-player__slide-list .slide {
@@ -107,4 +109,38 @@ body {
 .body-player__slide-list .slide-buttons .slide-button--active {
   background-color: #111;
   color: #fff;
+}
+
+@media (min-width: 850px) {
+  .body-player {
+    display: flex;
+    width: 100%;
+    padding: 10px 0;
+  }
+
+  .body-player__video-wrapper {
+    width: 384px;
+    min-width: 384px;
+    height: 288px;
+    position: relative;
+    margin-right: 15px;
+  }
+
+  .body-player__slide-list {
+    padding-top: 0;
+    width: 100%;
+  }
+
+  .body-player__slide-list .slide {
+    height: auto;
+  }
+
+  .body-player__slide-list .slide-buttons {
+    width: 384px;
+    max-width: 384px;
+  }
+
+  .body-player__slide-list .slide-buttons .slide-button:last-child {
+    margin-right: 0;
+  }
 }
