@@ -18,8 +18,12 @@ $(document).ready(function (e) {
     videoWrapper.attr('data-status', 'stop');
   });
   video.on('timeupdate', () => {
-    if(videoWrapper.attr('data-status') === 'stop') {
-      video[0].play()
+    if (videoWrapper.attr('data-status') === 'stop') {
+      try {
+        video[0].play()
+      } catch (e) {
+        console.error(e);
+      }
     }
   })
   $('.slide-buttons').on('click', '.slide-button', switchOnButton)
@@ -44,6 +48,7 @@ const setXmlData = () => {
 
       // render all slides and buttons
       let count = 1;
+      let countHtml = 0;
       $(xml).find('slide').each(function () {
         const time = $(this).attr('time');
         const file = $(this).attr('file');
@@ -55,7 +60,22 @@ const setXmlData = () => {
         timeData.push(timeSeconds);
 
         // render slides
-        $('.body-player__slide-list').append(`<img src="${file}" alt="slide" class="slide ${count === 1 && "active-slide"}" data-time="${time}" data-second="${timeSeconds}">`)
+        $.ajax({
+          url: file,
+          success: function (data) {
+            $('.body-player__slide-list').append(data);
+            if (countHtml === 0) {
+              $('.body-player__slide-list .slide')[countHtml].classList.add('active-slide');
+            }
+
+            $('.body-player__slide-list .slide')[countHtml]
+              .setAttribute('data-time', time);
+            $('.body-player__slide-list .slide')[countHtml]
+              .setAttribute('data-second', timeSeconds)
+          }
+        })
+          .catch(error => console.error(error));
+        // $('.body-player__slide-list').append(`<img src="${file}" alt="slide" class="slide ${count === 1 && "active-slide"}" data-time="${time}" data-second="${timeSeconds}">`)
 
         // render buttons
         $('.slide-buttons').append(`<div class="slide-button ${count === 1 && "slide-button--active"}" data-time="${time}" data-second="${timeSeconds}">${count}</div>`)
@@ -67,7 +87,7 @@ const setXmlData = () => {
 }
 
 // switch video on slide click
-function switchOnClickSlide (e) {
+function switchOnClickSlide(e) {
   let current = '';
 
   $(this).each(function () {
@@ -92,7 +112,7 @@ function switchOnClickSlide (e) {
 }
 
 // switch slide on video playing
-function switchSlideOnPlaying (e) {
+function switchSlideOnPlaying(e) {
   const video = $('.body-player__video-wrapper video')[0];
   const slides = $('.body-player__slide-list .slide');
   const buttons = $('.slide-buttons .slide-button');
@@ -103,19 +123,19 @@ function switchSlideOnPlaying (e) {
     let needIndex = 0;
     let index = 0;
     timeData.forEach(time => {
-      if(time < video.currentTime) {
+      if (time < video.currentTime) {
         needIndex = index;
       }
       index++;
     })
 
 
-    if(!slides[needIndex].classList.contains('active-slide')) {
+    if (!slides[needIndex].classList.contains('active-slide')) {
       slides.removeClass('active-slide');
       slides[needIndex].classList.add('active-slide')
     }
 
-    if(!buttons[needIndex].classList.contains('slide-button--active')) {
+    if (!buttons[needIndex].classList.contains('slide-button--active')) {
       buttons.removeClass('slide-button--active');
       buttons[needIndex].classList.add('slide-button--active')
     }
@@ -123,7 +143,7 @@ function switchSlideOnPlaying (e) {
 }
 
 // switch video on button click
-function switchOnButton (e) {
+function switchOnButton(e) {
   let current = '';
   console.log($(this));
 
@@ -143,7 +163,7 @@ function switchOnButton (e) {
 }
 
 // show thumbnail on progress bar hover
-function showThumbnail (e) {
+function showThumbnail(e) {
   thumbnail.fadeIn('fast');
 
   thumbnail.css({
@@ -152,6 +172,6 @@ function showThumbnail (e) {
 }
 
 // hidden thumbnail
-function hiddenThumbnail () {
+function hiddenThumbnail() {
   thumbnail.fadeOut('fast');
 }

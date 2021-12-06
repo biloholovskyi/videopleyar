@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <data>
     <video label="data/video.mp4" file="aloha"/>
-    <slide time="00:00.00 " file="data/wp.jpeg"/>
-    <slide time="01:00.00 " file="data/wp1.jpeg"/>
-    <slide time="02:05.00 " file="data/wp2.jpeg"/>
+    <slide time="00:00.00 " file="data/slide_1.html"/>
+    <slide time="01:00.00 " file="data/slide_2.html"/>
+    <slide time="02:05.00 " file="data/slide_3.html"/>
 </data>
