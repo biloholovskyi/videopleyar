@@ -58,14 +58,14 @@ body {
 }
 
 .body-player__slide-list {
-  padding-top: 345px;
+  padding-top: 320px;
   height: 100vh;
   overflow: auto;
 }
 
 .body-player__slide-list .slide {
   width: 100%;
-  height: calc(100vh - 370px);
+  height: calc(100vh - 340px);
   object-fit: cover;
   margin-bottom: 15px;
   cursor: pointer;
@@ -93,10 +93,13 @@ body {
 
 .body-player__slide-list .slide-buttons .slide-button {
   cursor: pointer;
-  width: 100%;
   margin-right: 15px;
   text-align: center;
-  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 22px;
   border: 1px solid #111;
   border-radius: 4px;
   transition: all .3s;
